@@ -15,6 +15,11 @@ import string
 import streamlit as st
 st.set_page_config(page_title="AI Email Classifier", layout="centered")
 
+import nltk
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
 # --- NLTK Data Downloads ---
 # Ensure NLTK data is available. This runs once when the app starts.
