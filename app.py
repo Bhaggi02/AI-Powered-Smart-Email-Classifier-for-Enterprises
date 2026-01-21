@@ -81,7 +81,7 @@ def remove_signatures(text):
     return text.strip()
 
 #def preprocess_email_for_category_model(text): #   if pd.isna(text) or not str(text).strip():
-        return ''
+   #     return ''
 #   text = str(text).lower()
 #  text = re.sub(r'^subject:\s*', '', text, flags=re.IGNORECASE)
 #  text = re.sub(r'(best regards|thanks|thank you|sincerely|regards).*', '', text, flags=re.IGNORECASE | re.DOTALL)
