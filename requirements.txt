@@ -6,3 +6,4 @@ nltk
 joblib
 matplotlib
 seaborn
+nltk
