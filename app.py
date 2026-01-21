@@ -12,6 +12,10 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 import string
 
+import streamlit as st
+st.set_page_config(page_title="AI Email Classifier", layout="centered")
+
+
 # --- NLTK Data Downloads ---
 # Ensure NLTK data is available. This runs once when the app starts.
 # For local deployment, NLTK data often needs to be downloaded to a specific path
