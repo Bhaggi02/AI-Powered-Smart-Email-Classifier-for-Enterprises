@@ -16,26 +16,26 @@ import streamlit as st
 st.set_page_config(page_title="AI Email Classifier", layout="centered")
 
 import nltk
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
-# --- NLTK Data Downloads ---
-# Ensure NLTK data is available. This runs once when the app starts.
-# For local deployment, NLTK data often needs to be downloaded to a specific path
-# or you can add a conditional download.
+# -------- NLTK FIX FOR STREAMLIT CLOUD (PYTHON 3.13) --------
 @st.cache_resource
-def download_nltk_data():
-    try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        nltk.download('stopwords')
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        nltk.download('punkt')
-download_nltk_data()
+def setup_nltk():
+    resources = [
+        "punkt",
+        "punkt_tab",
+        "stopwords"
+    ]
+    for res in resources:
+        try:
+            nltk.data.find(f"tokenizers/{res}" if "punkt" in res else f"corpora/{res}")
+        except LookupError:
+            nltk.download(res)
+
+setup_nltk()
+# -----------------------------------------------------------
+
 
 stop_words = set(stopwords.words('english'))
 
@@ -80,20 +80,32 @@ def remove_signatures(text):
         text = re.sub(pattern, '', text, flags=re.IGNORECASE | re.DOTALL)
     return text.strip()
 
-def preprocess_email_for_category_model(text):
-    if pd.isna(text) or not str(text).strip():
+#def preprocess_email_for_category_model(text): #   if pd.isna(text) or not str(text).strip():
         return ''
-    text = str(text).lower()
-    text = re.sub(r'^subject:\s*', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'(best regards|thanks|thank you|sincerely|regards).*', '', text, flags=re.IGNORECASE | re.DOTALL)
-    text = re.sub(r'--.*', '', text, flags=re.DOTALL)
-    text = re.sub(r'http\S+|www\.\S+', '', text)
-    text = re.sub(r'<.*?>', '', text)
-    text = text.translate(str.maketrans('', '', string.punctuation))
-    text = re.sub(r'\d+', '', text)
+#   text = str(text).lower()
+#  text = re.sub(r'^subject:\s*', '', text, flags=re.IGNORECASE)
+#  text = re.sub(r'(best regards|thanks|thank you|sincerely|regards).*', '', text, flags=re.IGNORECASE | re.DOTALL)
+#   text = re.sub(r'--.*', '', text, flags=re.DOTALL)
+#   text = re.sub(r'http\S+|www\.\S+', '', text)
+# text = re.sub(r'<.*?>', '', text)
+#  text = text.translate(str.maketrans('', '', string.punctuation))
+# text = re.sub(r'\d+', '', text)
+    #tokens = word_tokenize(text)
+   # tokens = [word for word in tokens if word not in stop_words and len(word) > 1]
+   # return ' '.join(tokens)
+
+
+def preprocess_email_for_category_model(text):
+    if not isinstance(text, str):
+        return ""
+
+    text = text.lower()
+    text = re.sub(r'\W+', ' ', text)
+
     tokens = word_tokenize(text)
-    tokens = [word for word in tokens if word not in stop_words and len(word) > 1]
-    return ' '.join(tokens)
+    tokens = [t for t in tokens if t not in stopwords.words('english')]
+
+    return " ".join(tokens)
 
 # --- 2. Keyword-based Urgency Detection ---
 high_urgency_keywords = ['urgent', 'immediately', 'asap', 'now', 'critical', 'emergency', 'requires immediate attention', 'time-sensitive', 'deadline today', 'respond quickly', 'crucial', 'urgent action', 'must be done']
